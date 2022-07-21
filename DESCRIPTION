@@ -1,0 +1,13 @@
+Package: rata
+Title: Responses Analysed Together or Apart
+Version: 0.1
+Author: Thomas Lumley
+Description: Tools for inference on multiple-response data
+Imports: survey
+Depends: R (>= 3.5.0), rimu
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+Encoding: UTF-8
+License: GPL-3
+Maintainer: Thomas Lumley <t.lumley@auckland.ac.nz>
+

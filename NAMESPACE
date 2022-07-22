@@ -1,0 +1,2 @@
+import(stats)
+export(has, hasonly,hasany,hasall,long,wide, mrglm)

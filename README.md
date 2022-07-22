@@ -2,4 +2,4 @@
 
 ## Responses analysed together or apart
 
-Building on 'rimu', a package for inference with multiple-response data
+Still very much in development and not ready for use, building on 'rimu', a package for inference with multiple-response data

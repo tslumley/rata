@@ -12,16 +12,16 @@ hasonly<-function(mr_object, value) mr_object %hasonly% value
 hasany<-function(mr_object, value) mr_object %hasany% value
 hasall<-function(mr_object, value) mr_object %hasall% value
 
-long_expand<-function(mr_object){
+long_expand<-function(mr_object,name){
     y<-as.matrix(as.mr(mr_object))
     Y<-as.vector(y)
     id<-rep(1:nrow(y), ncol(y))
     level<-rep(levels(mr_object),nrow(y))
     rval<-data.frame(id=id, value=level, present=Y)
-    nm<-deparse(substitute(mr_object))
-    names(rval)[1]<-deparse(bquote(id(.(as.name(nm)))))
-    names(rval)[2]<-deparse(bquote(value(.(as.name(nm)))))
-    names(rval)[3]<-deparse(bquote(present(.(as.name(nm)))))
+   
+    names(rval)[1]<-deparse(bquote(id(.(as.name(name)))))
+    names(rval)[2]<-deparse(bquote(value(.(as.name(name)))))
+    names(rval)[3]<-deparse(bquote(present(.(as.name(name)))))
     rval
 }
 
@@ -62,6 +62,16 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     mf[[1L]] <- quote(stats::model.frame)
     mf <- eval(mf, parent.frame())
 
+    if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
+        whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
+        v<-all.vars(attr(tform,variables)[-1][whichlong])
+        print(v)
+        if (length(v)>1) stop("There can be only one")
+        d<-long_expand(mf[,whichlong[1]], v)
+        longmf<-mf[d[[1]],]
+        longmf[,whichlong]<-d[,match(names(d)[-1],names(mf))]
+        ##FIXME
+    }
     if (!is.null(attr(tform,"specials")$each)){
          ## need to expand the data
          whichlong<-attr(tform,"specials")$each

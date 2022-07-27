@@ -1,9 +1,30 @@
-long<-function(x) x
+## magic
+present<-function(y) y
+value<-function(x) x
+
+each<-function(x) x
+
+## ordinary functions
 wide<-function(mr_object) as.matrix(mr_object)
+
 has<-function(mr_object, value) mr_object %has% value
 hasonly<-function(mr_object, value) mr_object %hasonly% value
 hasany<-function(mr_object, value) mr_object %hasany% value
 hasall<-function(mr_object, value) mr_object %hasall% value
+
+long_expand<-function(mr_object){
+    y<-as.matrix(as.mr(mr_object))
+    Y<-as.vector(y)
+    id<-rep(1:nrow(y), ncol(y))
+    level<-rep(levels(mr_object),nrow(y))
+    rval<-data.frame(id=id, value=level, present=Y)
+    nm<-deparse(substitute(mr_object))
+    names(rval)[1]<-deparse(bquote(id(.(as.name(nm)))))
+    names(rval)[2]<-deparse(bquote(value(.(as.name(nm)))))
+    names(rval)[3]<-deparse(bquote(present(.(as.name(nm)))))
+    rval
+}
+
 
 vcov.mrglm<-function(model,...) model$vcov
 
@@ -27,7 +48,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
          
     if (missing(data)) 
         stop("'data' must be specified")
-    special <- c("long")
+    special <- c("each","value","present")
     tform <-  terms(formula, special, data = data)
     
     if (!(all(all.vars(formula) %in% names(data))))
@@ -41,9 +62,9 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     mf[[1L]] <- quote(stats::model.frame)
     mf <- eval(mf, parent.frame())
 
-    if (!is.null(attr(tform,"specials")$long)){
+    if (!is.null(attr(tform,"specials")$each)){
          ## need to expand the data
-         whichlong<-attr(tform,"specials")$long
+         whichlong<-attr(tform,"specials")$each
          nms<-sapply(names(mf)[whichlong],as.name)
          names(nms)<-NULL
          longmr<- eval(bquote(with(mf, mr_stack(..(nms))), splice=TRUE))

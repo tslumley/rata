@@ -70,18 +70,28 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
         d<-long_expand(mf[,whichlong[1]], v)
         longmf<-mf[d[[1]],]
         longmf[,whichlong]<-d[,match(names(d)[-1],names(mf))]
-        ##FIXME
-    }
-    if (!is.null(attr(tform,"specials")$each)){
-         ## need to expand the data
-         whichlong<-attr(tform,"specials")$each
-         nms<-sapply(names(mf)[whichlong],as.name)
-         names(nms)<-NULL
-         longmr<- eval(bquote(with(mf, mr_stack(..(nms))), splice=TRUE))
-         longmf<-mf[longmr$id,]
-         longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id")]
-        id<-longmr$id
+        id1<-d[[1]]
         mf<-longmf
+        ##FIXME
+    } else {
+        id1<-NULL
+    }
+
+        
+    if (!is.null(attr(tform,"specials")$each)){
+        ## need to expand the data
+        whichlong<-attr(tform,"specials")$each
+         nms<-sapply(names(mf)[whichlong],as.name)
+        names(nms)<-NULL
+        longmr<- eval(bquote(with(mf, mr_stack(..(nms))), splice=TRUE))
+        longmf<-mf[longmr$id,]
+        longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id")]
+        id2<-longmr$id
+        mf<-longmf
+        if (!is.null(id2)){
+          ## id merge thing somehow
+            stop("write id merge thing here")
+        }
     } else {
          id<-NULL
      }

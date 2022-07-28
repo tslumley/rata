@@ -93,7 +93,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
             stop("write id merge thing here")
         }
     } else {
-         id<-NULL
+         id<-id1
      }
 
     control <- do.call("glm.control", control)
@@ -160,4 +160,16 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
      rval$naive.cov<-summary(rval)$cov.scaled
      rval$vcov<-V
      rval
+}
+
+
+
+mrloglin<-function(formula, data,...){
+
+    ## use svyloglin
+
+
+
+
+
 }

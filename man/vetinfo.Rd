@@ -26,5 +26,12 @@ Decady YJ, Thomas DR (2000) "A Simple Test of Association for Contingency Tables
 \examples{
 data(vetinfo)
 with(vetinfo, mtable(education, sources))
+
+
+ll<-long_expand(vetinfo$sources,"sources")
+ll$education<-vetinfo$education[ll$`id(sources)`]
+with(subset(ll, `present(sources)`==1), table(`value(sources)`,education))
+ 
+xtabs(`present(sources)`~`value(sources)`+education,data=ll)
 }
 \keyword{datasets}

@@ -16,7 +16,7 @@ long_expand<-function(mr_object,name){
     y<-as.matrix(as.mr(mr_object))
     Y<-as.vector(y)
     id<-rep(1:nrow(y), ncol(y))
-    level<-rep(levels(mr_object),nrow(y))
+    level<-rep(levels(mr_object),each=nrow(y))
     rval<-data.frame(id=id, value=level, present=Y)
    
     names(rval)[1]<-deparse(bquote(id(.(as.name(name)))))

@@ -72,12 +72,11 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
         longmf[,whichlong]<-d[,match(names(d)[-1],names(mf))]
         id1<-d[[1]]
         mf<-longmf
-        ##FIXME
     } else {
         id1<-NULL
     }
-
-        
+    
+    
     if (!is.null(attr(tform,"specials")$each)){
         ## need to expand the data
         whichlong<-attr(tform,"specials")$each
@@ -166,10 +165,10 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
 
 mrloglin<-function(formula, data,...){
 
+    if (!(all.vars(formula) %in% names(data)))
+        stop("all variables must be in data= argument")
+
+    
     ## use svyloglin
-
-
-
-
 
 }

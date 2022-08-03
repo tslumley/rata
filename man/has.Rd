@@ -28,16 +28,10 @@ A multiple-response object
 A character vector with one or more levels of the object
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 A logical vector for the 'has' functions; a logical matrix for \code{wide}
 }
-\references{
-
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{long}},\code{\link{mrglm}}

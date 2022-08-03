@@ -1,0 +1,85 @@
+---
+title: "Working models for multiple response data"
+author: "Thomas Lumley"
+date: "03/09/2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working models for multiple response data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Working marginal glms
+
+From the help page for the `vetinfo` data, from Loughin and Scherer (1998) 
+
+```{r}
+library(rata)
+data(vetinfo)
+mtable(vetinfo)
+```
+
+We can expand this to binary yes/no data on all possible response
+
+```{r}
+ll <- long_expand(vetinfo$sources,"sources")
+ll$education<-vetinfo$education[ll$`id(sources)`]
+dim(vetinfo)
+dim(ll)
+head(ll)
+```
+
+One possible model is that the probabilities of response do not depend on education.  If we ignore the correlation
+
+```{r}
+m0 <- glm(`present(sources)`~`value(sources)`+0, data=ll, family=binomial)
+summary(m0)
+```
+
+we get the same answers as Agresti and Liu, table 2.  We can test, compared to a saturated model or compared to a main-effects model
+
+```{r}
+m1 <- glm(`present(sources)`~`value(sources)`+education, data=ll, family=binomial)
+msat <- glm(`present(sources)`~`value(sources)`*education, data=ll, family=binomial)
+anova(m0,m1,test="Chi")
+anova(m0,msat,test="Chi")
+```
+
+We shouldn't ignore the correlation, of course.  We can get sandwich estimators from a variety of packages, such as the `survey` package
+
+```{r}
+library(survey)
+dkansas <- svydesign(id=~`id(sources)`, data=ll)
+s0 <- svyglm(`present(sources)`~`value(sources)`+0, design=dkansas, family=binomial)
+s1 <- svyglm(`present(sources)`~`value(sources)`+education, design=dkansas, family=binomial)
+ssat <- svyglm(`present(sources)`~`value(sources)`*education, design=dkansas, family=binomial)
+anova(s0, s1)
+anova(s0, ssat)
+```
+
+The goal of the `rata` package is to do the data expansion automagically as appropriate.  This expansion is appropriate when there's a multiple-response outcome variable. When there's a multiple-response exposure you want something different, and we have the `has` functions to construct binary predictors and the `each` function to expand the data just partway so that there's a record for each response
+
+### Working loglinear models
+
+The approach of Loughin and Scherer, and also of Decady and Thomas, is to fit a multinomial working model. That is they estimate relationships in a  loglinear model as if the `sources` variable had a multinomial distribution. They use the score test statistic in that model as a test statistic, referring it to its actual sampling distribution in the presence of multiple response.  As Decady and Thomas point out, this approach has been used in the survey statistics field for a long time, dating back to the loglinear model papers of Rao and Scott.
+
+One difference between these models and the marginal glms is that these models are not symmetric under exchanging 1s and 0s.  Agresti and Liu regard this as a problem; I'm not convinced, in this context, that there should be such a symmetry.
+
+We need to expand the data as above, but use `svyloglin` rather than `svyglm` for modelling.
+
+
+
+### References
+
+Agresti A and Liu I-M (1999) "Modeling a Categorical Variable Allowing Arbitrarily Many Category Choices" Biometrics 55:936-943
+
+Decady YJ, Thomas DR (2000) "A Simple Test of Association for Contingency Tables with Multiple Column Responses" Biometrics 56: 893-896
+
+Loughin TM, Scherer PN (1998) "Testing for Association in Contingency Tables with Multiple Column Responses" Biometrics 54: 630-637
+
+Rao, JNK, Scott, AJ (1984) "On Chi-squared Tests For Multiway Contigency Tables with Proportions Estimated From Survey Data" Annals of Statistics 12:46-60.
+

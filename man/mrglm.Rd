@@ -75,5 +75,7 @@ data(vetinfo)
 mrglm(present(sources)~value(sources),data=vetinfo, family=binomial)
 mrglm(present(sources)~value(sources)+education,data=vetinfo, family=binomial)
 
+mrglm(as.integer(education)~each(sources),data=vetinfo)
+mrglm(as.integer(education)~wide(sources),data=vetinfo)
 }
 

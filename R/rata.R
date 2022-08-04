@@ -65,7 +65,6 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
         whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
         v<-all.vars(attr(tform,"variables")[-1][whichlong])
-        print(v)
         if (length(v)>1) stop("There can be only one")
         d<-long_expand(mf[,whichlong[1]], v)
         longmf<-mf[d[[1]],]
@@ -88,14 +87,16 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
         longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id")]
         id2<-longmr$id
         mf<-longmf
-        if (!is.null(id2)){
+        if (!is.null(id1)){
           ## id merge thing somehow
             stop("write id merge thing here")
+        } else {
+            id<-id2
         }
     } else {
-         id<-id1
-     }
-
+        id<-id1
+    }
+    
     control <- do.call("glm.control", control)
     mt <- attr(mf, "terms")
     Y <- model.response(mf, "any")

@@ -64,12 +64,13 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
 
     if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
         whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
-        v<-all.vars(attr(tform,variables)[-1][whichlong])
+        v<-all.vars(attr(tform,"variables")[-1][whichlong])
         print(v)
         if (length(v)>1) stop("There can be only one")
         d<-long_expand(mf[,whichlong[1]], v)
         longmf<-mf[d[[1]],]
-        longmf[,whichlong]<-d[,match(names(d)[-1],names(mf))]
+        pos<-match(names(mf),names(d))
+        longmf[,whichlong]<-d[,pos[!is.na(pos)]]
         id1<-d[[1]]
         mf<-longmf
     } else {
@@ -152,7 +153,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
      infl<-mrglm_estfun(rval)%*%summary(rval)$cov.unscaled
      
      if (!is.null(id))
-         V<-crossprod(rowsum(infl, longmr$id))
+         V<-crossprod(rowsum(infl, id))  ##FIXME: more than one id to merge
      else
          V<-crossprod(infl)
      

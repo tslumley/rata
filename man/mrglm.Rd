@@ -51,7 +51,9 @@ As in \code{\link{glm}}}
 As in \code{\link{glm}}}
 }
 \details{
-In addition to the functions for creating binary variables (see \code{\link{has}}), there are three special functions for expanding the data.  The two functions \code{present} and \code{values} are used when the outcome variable is a multiple-response variable. When these are used, \code{mrglm} creates a record for every possible level of the variable, with \code{present()} giving binary membership indicators and \code{values()} giving the corresponding level of the factor.   The function \code{each} is used when a predictor variable has multiple responses. When \code{each} is used, \code{mrglm} expands the data to give a row for each level that is actually present and \code{each()} returns a factor with those levels. 
+In addition to the functions for creating binary variables (see \code{\link{has}}), there are three special functions for expanding the data.  The two functions \code{present} and \code{values} are used when the outcome variable is a multiple-response variable. When these are used, \code{mrglm} creates a record for every possible level of the variable, with \code{present()} giving binary membership indicators and \code{values()} giving the corresponding level of the factor.   The function \code{each} is used when a predictor variable has multiple responses. When \code{each} is used, \code{mrglm} expands the data to give a row for each level that is actually present and \code{each()} returns a factor with those levels.
+
+Only one variable may have \code{present()}/\code{values()} terms. This may be relaxed in future versions if there are good examples of it being useful.
 
 }
 

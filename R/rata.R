@@ -65,7 +65,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
         whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
         v<-all.vars(attr(tform,"variables")[-1][whichlong])
-        if (length(v)>1) stop("There can be only one")
+        if (length(v)>1) stop("Only one variable may have present()/values() terms")
         d<-long_expand(mf[,whichlong[1]], v)
         longmf<-mf[d[[1]],]
         pos<-match(names(mf),names(d))
@@ -86,12 +86,11 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
         longmf<-mf[longmr$id,]
         longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id")]
         id2<-longmr$id
-        mf<-longmf
         if (!is.null(id1)){
-          ## id merge thing somehow
             stop("write id merge thing here")
         } else {
             id<-id2
+            mf<-longmf
         }
     } else {
         id<-id1

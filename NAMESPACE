@@ -1,4 +1,4 @@
 import(stats)
 export(has, hasonly,hasany,hasall,
        present, value, each, wide,
-       mrglm,  long_expand)
+       mrglm,  long_expand, mrloglin)

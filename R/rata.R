@@ -175,8 +175,8 @@ mrloglin<-function(formula, data,...){
     names(nms)<-NULL
     longmf<-eval(bquote(with(mf, mr_stack(..(nms))),splice=TRUE))
 
-    longdes<-svydesign(id=~id, data=longmf, prob=~1)
-    model<-svyloglin(formula, design=longdes)
+    longdes<-survey::svydesign(id=~id, data=longmf, prob=~1)
+    model<-survey::svyloglin(formula, design=longdes)
 
     model$call<-sys.call()
     class(model)<-c("mrloglin",class(model))

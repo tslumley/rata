@@ -167,10 +167,18 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
 
 mrloglin<-function(formula, data,...){
 
-    if (!(all.vars(formula) %in% names(data)))
+    if (!all(all.vars(formula) %in% names(data)))
         stop("all variables must be in data= argument")
 
-    
-    ## use svyloglin
+    mf<-model.frame(formula, data)
+    nms<-sapply(names(mf),as.name)
+    names(nms)<-NULL
+    longmf<-eval(bquote(with(mf, mr_stack(..(nms))),splice=TRUE))
 
+    longdes<-svydesign(id=~id, data=longmf, prob=~1)
+    model<-svyloglin(formula, design=longdes)
+
+    model$call<-sys.call()
+    class(model)<-c("mrloglin",class(model))
+    model
 }

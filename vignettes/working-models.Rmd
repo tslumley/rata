@@ -69,8 +69,45 @@ The approach of Loughin and Scherer, and also of Decady and Thomas, is to fit a 
 
 One difference between these models and the marginal glms is that these models are not symmetric under exchanging 1s and 0s.  Agresti and Liu regard this as a problem; I'm not convinced, in this context, that there should be such a symmetry.
 
-We need to expand the data as above, but use `svyloglin` rather than `svyglm` for modelling.
+We need to expand the data, but not quite as above -- we only want a record for each observed response. We then use `svyloglin` rather than `svyglm` for modelling.
 
+```{r}
+longmr<-with(vetinfo,mr_stack(sources))
+longdata<-data.frame(id=longmr$id,sources=longmr$sources,education=vetinfo$education[longmr$id])	
+
+nrow(longdata)
+sum(mr_count(vetinfo$sources))
+```
+
+Now define the survey design object
+```{r}
+library(survey)
+des2<-svydesign(id=~id, data=longdata)
+des2
+nrow(des2)
+nrow(vetinfo)
+```
+We have one record for each observed response, and one cluster for each sampled individual.  Now some loglinear models: first, unordered ones.
+
+```{r}
+ll0<-svyloglin(~sources+education,design=des2)
+ll1<-update(ll0, ~.+sources:education)
+summary(ll0)
+summary(ll1)
+anova(ll0,ll1)
+```
+
+It looks as though there's a trend with education; try a linear association model
+
+```{r}
+linl0<-svyloglin(~sources+as.numeric(education),design=des2)
+linl1<-svyloglin(~sources*as.numeric(education),design=des2)
+summary(linl1)
+summary(linl0)
+anova(linl1,linl0)
+```
+
+Now the goal is to do this automatically, which is a lot easier than with `mrglm` because there isn't as much magic. 
 
 
 ### References

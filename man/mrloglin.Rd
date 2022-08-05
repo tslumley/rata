@@ -50,7 +50,7 @@ The underlying code in \code{svyloglin} is a bit fragile. Real examples of it fa
 
 The vignette "Working models for multiple response data"
 
-\code{\link[survey]{svyloglin}}
+\code{\link{svyloglin}}
 }
 \examples{
 data(vetinfo)

@@ -1,6 +1,6 @@
 Package: rata
 Title: Responses Analysed Together or Apart
-Version: 0.2
+Version: 0.3
 Author: Thomas Lumley
 Description: Tools for inference on multiple-response data
 Imports: survey

@@ -1,7 +1,7 @@
 ## magic
 present<-function(y) y
 value<-function(x) x
-change<-function(new,old) as.matrix(new)-as.matrix(old)
+change<-function(new,old) cbind(new,old)
 
 each<-function(x) x
 

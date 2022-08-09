@@ -1,4 +1,7 @@
 import(stats)
 export(has, hasonly,hasany,hasall,
-       present, value, each, wide,
+       present, value, each, wide, change,
        mrglm,  long_expand, mrloglin)
+
+S3method(anova,mrloglin)
+

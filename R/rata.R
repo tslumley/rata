@@ -183,3 +183,9 @@ mrloglin<-function(formula, data,...){
     class(model)<-c("mrloglin",class(model))
     model
 }
+
+anova.mrloglin<-function(object, object1, ..., integrate = FALSE) {
+    rval<-NextMethod()
+    class(rval)<-c("anova.mrloglin", class(rval))
+    rval
+}

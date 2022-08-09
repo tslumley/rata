@@ -13,7 +13,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Working marginal glms
+## Working marginal glms
 
 From the help page for the `vetinfo` data, from Loughin and Scherer (1998) 
 
@@ -63,7 +63,20 @@ anova(s0, ssat)
 
 The goal of the `rata` package is to do the data expansion automagically as appropriate.  This expansion is appropriate when there's a multiple-response outcome variable. When there's a multiple-response exposure you want something different, and we have the `has` functions to construct binary predictors and the `each` function to expand the data just partway so that there's a record for each response
 
-### Working loglinear models
+### Rata package
+
+The code is similar: there are no backticks in the model formula and the data expansion happens internally
+
+```{r}
+rs0 <- mrglm(present(sources)~value(sources)+0, data=vetinfo, family=binomial)
+rs1 <- mrglm(present(sources)~value(sources)+education, data=vetinfo, family=binomial)
+rssat <- mrglm(present(sources)~value(sources)*education, data=vetinfo, family=binomial)
+```
+
+FIXME: anova method?
+
+
+## Working loglinear models
 
 The approach of Loughin and Scherer, and also of Decady and Thomas, is to fit a multinomial working model. That is they estimate relationships in a  loglinear model as if the `sources` variable had a multinomial distribution. They use the score test statistic in that model as a test statistic, referring it to its actual sampling distribution in the presence of multiple response.  As Decady and Thomas point out, this approach has been used in the survey statistics field for a long time, dating back to the loglinear model papers of Rao and Scott.
 
@@ -107,7 +120,25 @@ summary(linl0)
 anova(linl1,linl0)
 ```
 
-Now the goal is to do this automatically, which is a lot easier than with `mrglm` because there isn't as much magic. 
+### Rata package
+
+```{r}
+rll0<-mrloglin(~sources+education,data=vetinfo)
+rll1<-update(rll0, ~.+sources:education)
+summary(rll0)
+summary(rll1)
+anova(rll0,rll1)
+```
+
+For the linear association model we can't put `as.numeric(education)` in directly, we have to do it by updating a model that already has the right base variables:
+
+```
+rlin0<-update(rll0, .~sources+as.numeric(education))
+rlin1<-update(rll0, .~sources*as.numeric(education))
+summary(rlin1)
+summary(rlin0)
+anova(rlin1,rlin0)
+```
 
 
 ### References

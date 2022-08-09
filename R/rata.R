@@ -1,6 +1,7 @@
 ## magic
 present<-function(y) y
 value<-function(x) x
+change<-function(new,old) as.matrix(new)-as.matrix(old)
 
 each<-function(x) x
 
@@ -65,7 +66,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
         whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
         v<-all.vars(attr(tform,"variables")[-1][whichlong])
-        if (length(v)>1) stop("Only one variable may have present()/values() terms")
+        if (length(v)>1) stop("Only one variable may have present()/value() terms")
         d<-long_expand(mf[,whichlong[1]], v)
         longmf<-mf[d[[1]],]
         pos<-match(names(mf),names(d))
@@ -87,7 +88,8 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
         longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id")]
         id2<-longmr$id
         if (!is.null(id1)){
-            stop("write id merge thing here")
+            id<-id1[id2]
+            mf<-longmf
         } else {
             id<-id2
             mf<-longmf

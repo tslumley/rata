@@ -4,4 +4,6 @@ export(has, hasonly,hasany,hasall,
        mrglm,  long_expand, mrloglin)
 
 S3method(anova,mrloglin)
+S3method(anova, mrglm)
+S3method(print, seqanova.mrglm)
 

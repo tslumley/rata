@@ -62,15 +62,17 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     mf$drop.unused.levels <- TRUE
     mf[[1L]] <- quote(stats::model.frame)
     mf <- eval(mf, parent.frame())
+    mfterms<-attr(mf,"terms")
 
     if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
         whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
-        v<-all.vars(attr(tform,"variables")[-1][whichlong])
+        ##v<-all.vars(attr(tform,"variables")[-1][whichlong])
+        v<-unique(unlist(lapply(attr(tform,"variables"), all.vars)[-1][whichlong]))
         if (length(v)>1) stop("Only one variable may have present()/value() terms")
         d<-long_expand(mf[,whichlong[1]], v)
-        longmf<-mf[d[[1]],]
+        longmf<-mf[d[[1]],,drop=FALSE]
         pos<-match(names(mf),names(d))
-        longmf[,whichlong]<-d[,pos[!is.na(pos)]]
+        longmf[,whichlong]<-d[,pos[!is.na(pos)],drop=FALSE]
         id1<-d[[1]]
         mf<-longmf
     } else {
@@ -84,8 +86,8 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
          nms<-sapply(names(mf)[whichlong],as.name)
         names(nms)<-NULL
         longmr<- eval(bquote(with(mf, mr_stack(..(nms))), splice=TRUE))
-        longmf<-mf[longmr$id,]
-        longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id")]
+        longmf<-mf[longmr$id,,drop=FALSE]
+        longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id"),drop=FALSE]
         id2<-longmr$id
         if (!is.null(id1)){
             id<-id1[id2]
@@ -97,6 +99,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     } else {
         id<-id1
     }
+    attr(mf,"terms")<-mfterms
     
     control <- do.call("glm.control", control)
     mt <- attr(mf, "terms")
@@ -147,7 +150,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
 
     
     rval<-structure(c(fit, list(call = cal, formula = formula, terms = mt, 
-        data = data, offset = offset, control = control, method = method, 
+        data = data, offset = offset, control = control, method = method, id=id,
         contrasts = attr(X, "contrasts"), xlevels = .getXlevels(mt, mf))),
         class = c(fit$class, c("mrglm", "glm", "lm")))
 
@@ -189,3 +192,173 @@ anova.mrloglin<-function(object, object1, ..., integrate = FALSE) {
     class(rval)<-c("anova.mrloglin", class(rval))
     rval
 }
+
+
+
+anova.mrglm<-function (object, object2 = NULL, test = c("F", "Chisq"), method = c("LRT", 
+    "Wald"), tolerance = 1e-05, ...) 
+{
+    test <- match.arg(test)
+    method <- match.arg(method)
+    if (is.null(object2)) 
+        return(oneanova.mrglm(object, test, method))
+    t1 <- attr(terms(object), "term.labels")
+    t2 <- attr(terms(object2), "term.labels")
+
+    X <- model.matrix(object)
+    Z <- model.matrix(object2)
+    if (nrow(X) != nrow(Z)) 
+        stop("models have different numbers of observations")
+    if (ncol(X) > ncol(Z)) {
+        tmp <- X
+        X <- Z
+        Z <- tmp
+        bigger <- 1
+    }
+    else bigger <- 2
+    resids<-suppressWarnings(summary(lm(X ~ Z)))
+    if (NCOL(X)==1){
+        if (suppressWarnings(summary(lm(X ~ Z)))$sigma/(tolerance+SD(X))>tolerance)
+            stop("models not nested")
+    } else if (any(sapply(suppressWarnings(summary(lm(X ~ Z))), "[[", 
+                          "sigma")/(tolerance + SD(X)) > tolerance)) {
+        stop("models not nested")
+    }
+    XX <- matrix(nrow = nrow(Z), ncol = ncol(Z))
+    xform <- lm(Z[, 1] ~ X + 0)
+    XX[, 1] <- resid(xform)
+    for (i in 2:ncol(Z)) {
+        XX[, i] <- resid(xform <- lm(Z[, i] ~ X + Z[, 1:(i - 
+            1)] + 0))
+    }
+    colkeep <- colMeans(abs(XX))/(tolerance + colMeans(abs(Z))) > 
+        tolerance
+    XX <- XX[, colkeep, drop = FALSE]
+    index <- ncol(X) + (1:ncol(XX))
+    mu <- if (bigger == 1) 
+        fitted(object)
+    else fitted(object2)
+    eta <- if (bigger == 1) 
+        object$linear.predictors
+    else object2$linear.predictors
+    offset <- if (bigger == 1) 
+        object$offset
+    else object2$offset
+    if (is.null(offset)) 
+        offset <- 0
+    y <- object$y
+    pweights <- rep(1, length(y))
+
+    ywork <- eta - offset + (y - mu)/object$family$mu.eta(eta)
+    wwork <- ((pweights * object$family$mu.eta(eta)^2)/object$family$variance(mu))
+    wlm <- lm.wfit(cbind(X, XX), ywork, wwork)
+    p1 <- 1:wlm$rank
+    Ainv <- chol2inv(wlm$qr$qr[p1, p1, drop = FALSE])
+    estfun <- cbind(X, XX) * wwork * ((y - mu)/object$family$mu.eta(eta))
+    design <- object$survey.design
+
+    V<-crossprod(rowsum(estfun%*%Ainv, object$id))
+    
+    V <- V[index, index]
+    df <- min(object$df.residual, object2$df.residual)
+    if (method == "LRT") {
+        V0 <- Ainv[index, index]
+        chisq <- if (bigger == 1) 
+            deviance(object2) - deviance(object)
+        else deviance(object) - deviance(object2)
+        misspec <- eigen(solve(V0) %*% V, only.values = TRUE)$values
+        if (test == "Chisq") 
+            p <- survey::pchisqsum(chisq, rep(1, length(misspec)), misspec, 
+                method = "sad", lower.tail = FALSE)
+        else p <- survey::pFsum(chisq, rep(1, length(misspec)), misspec, 
+            ddf = df, method = "sad", lower.tail = FALSE)
+        rval <- list(call = sys.call(), chisq = chisq, df = length(index), 
+            p = p, lambda = misspec, ddf = df, mcall = if (bigger == 
+                1) object$call else object2$call, test.terms = if (bigger == 
+                1) c(setdiff(t1, t2), "-", setdiff(t2, t1)) else c(setdiff(t2, 
+                t1), "-", setdiff(t1, t2)))
+        class(rval) <- "regTermTestLRT"
+    }
+    else {
+        beta <- wlm$coefficients[index]
+        chisq <- crossprod(beta, solve(V, beta))
+        if (test == "Chisq") {
+            p <- pchisq(chisq, df = length(index), lower.tail = FALSE)
+        }
+        else {
+            p <- pf(chisq/length(index), df1 = length(index), 
+                df2 = df, lower.tail = FALSE)
+        }
+        rval <- list(call = sys.call(), Ftest = chisq/length(index), 
+                     df = length(index),
+                     p = p, ddf = df,
+                     mcall = if (bigger == 1) object$call else object2$call,
+                     test.terms = if (bigger == 1) c(setdiff(t1, t2), "-", setdiff(t2, t1)) else c(setdiff(t2, t1), "-", setdiff(t1, t2)))
+        class(rval) <- "regTermTest"
+    }
+    rval
+}
+
+
+oneanova.mrglm<-function (object, test, method) 
+{
+    tt <- terms(object)
+    tlbls <- attr(tt, "term.labels")
+    nt <- length(tlbls)
+    if (nt < 2) 
+        return(NULL)
+    seqtests <- vector("list", nt)
+    if (test == "F") 
+        ddf <- NULL
+    else ddf <- Inf
+    lastmodel<-thismodel <- object
+    n<-length(object$y)
+    if (!("formula") %in% names(thismodel$call)) 
+        names(thismodel$call)[[2]] <- "formula"
+    thisformula<-formula(thismodel)
+    for (i in nt:1) {
+        thisterm <- tlbls[i]
+        dropformula <- survey::make.formula(thisterm)[[2]]
+        thisformula<-eval(bquote(update(thisformula, .~.-(.(dropformula)))))
+        thismodel<- eval(bquote(update(thismodel, .(thisformula))))
+        seqtests[[i]] <-  anova(thismodel, lastmodel)
+        lastmodel<-thismodel
+        if (length(thismodel$y)!=n) stop("Data sets are not the same size: missing values?")
+    }
+    class(seqtests) <- "seqanova.mrglm"
+    attr(seqtests, "method") <- method
+    attr(seqtests, "test") <- test
+    seqtests
+}
+
+print.seqanova.mrglm<-function (x, ...) 
+{
+    isWald <- attr(x, "method") == "Wald"
+    isF <- attr(x, "test") == "F"
+    cat("Anova table: ")
+    if (isWald) 
+        cat("(Wald tests)\n")
+    else cat(" (Rao-Scott LRT)\n")
+    print(x[[1]]$mcall)
+    terms <- sapply(x, "[[", "test.terms")
+    stats <- if (isF && isWald) 
+        sapply(x, "[[", "Ftest")
+    else sapply(x, "[[", "chisq")
+    if (!isWald) 
+        stats <- cbind(stats, DEff = sapply(x, function(xi) mean(xi$lambda)))
+    df <- sapply(x, "[[", "df")
+    p <- sapply(x, "[[", "p")
+    if (!isF) {
+        rval <- cbind(stats, df, p)
+    }
+    else {
+        ddf <- sapply(x, "[[", "ddf")
+        rval <- cbind(stats, df, ddf, p)
+    }
+    rownames(rval) <- terms[1,]
+    printCoefmat(rval, tst.ind = 1, zap.ind = 2:3, has.Pvalue = TRUE)
+    invisible(x)
+}
+
+
+SD<-function (x)  if (NCOL(x) > 1) apply(x, 2, sd) else sd(x)

@@ -1,5 +1,6 @@
 \name{mrglm}
 \alias{mrglm}
+\alias{anova.mrglm}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Fit marginal generalised linear models to multiple-response data
@@ -9,6 +10,8 @@ This function fits generalised linear models using \code{\link{glm}}, after expa
 }
 \usage{
 mrglm(formula, family = gaussian, data, weights, subset, na.action, start = NULL, etastart, mustart, offset, control = list(...), model = TRUE, x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...)
+\method{anova}{mrglm}(object, object2 = NULL, test = c("F", "Chisq"), method = c("LRT", 
+    "Wald"), tolerance = 1e-05, ...) 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,35 +23,12 @@ As in \code{\link{glm}}}
   \item{data}{
 A data frame containing all the variables in the formula. 
 }
-  \item{weights}{
+  \item{weights, subset, na.action, start, etastart,mustart,offset, control,model,x,y,singular.ok,contrasts}{
 As in \code{\link{glm}}}
-  \item{subset}{
-As in \code{\link{glm}}
-}
-  \item{na.action}{
-As in \code{\link{glm}}}
-  \item{start}{
-As in \code{\link{glm}}}
-  \item{etastart}{
-As in \code{\link{glm}}}
-  \item{mustart}{
-As in \code{\link{glm}}}
-  \item{offset}{
-As in \code{\link{glm}}}
-  \item{control}{
-As in \code{\link{glm}}}
-  \item{model}{
-As in \code{\link{glm}}}
-  \item{x}{
-As in \code{\link{glm}}}
-  \item{y}{
-As in \code{\link{glm}}}
-  \item{singular.ok}{
-As in \code{\link{glm}}}
-  \item{contrasts}{
-As in \code{\link{glm}}}
-  \item{\dots}{
-As in \code{\link{glm}}}
+\item{object1,object2}{Objects of class \code{mrglm} representing nested models to be compared}
+\item{method,test}{Rao-Scott working likelihood ratio test or Wald test, and F or chi-squared approximation. F is usually preferable}
+\item{tolerance}{Tolerance for checking whether models are actually nested}
+\item{\dots}{not used}
 }
 \details{
 In addition to the functions for creating binary variables (see \code{\link{has}}), there are three special functions for expanding the data.  The two functions \code{present} and \code{values} are used when the outcome variable is a multiple-response variable. When these are used, \code{mrglm} creates a record for every possible level of the variable, with \code{present()} giving binary membership indicators and \code{values()} giving the corresponding level of the factor.   The function \code{each} is used when a predictor variable has multiple responses. When \code{each} is used, \code{mrglm} expands the data to give a row for each level that is actually present and \code{each()} returns a factor with those levels.
@@ -71,13 +51,21 @@ Agresti A and Liu I-M (1999) "Modeling a Categorical Variable Allowing Arbitrari
 
 \seealso{
 The vignette "Working models for multiple response data"
+
+\code{\link{anova.svyglm}}
 }
 \examples{
 data(vetinfo)
-mrglm(present(sources)~value(sources),data=vetinfo, family=binomial)
-mrglm(present(sources)~value(sources)+education,data=vetinfo, family=binomial)
+(model0<-mrglm(present(sources)~value(sources),data=vetinfo, family=binomial))
+(model1<-mrglm(present(sources)~value(sources)+education,data=vetinfo, family=binomial))
+model2<-mrglm(present(sources)~value(sources)*education,data=vetinfo, family=binomial)
+anova(model1,model0)
+anova(model2)
+
 
 mrglm(as.integer(education)~each(sources),data=vetinfo)
 mrglm(as.integer(education)~wide(sources),data=vetinfo)
+
+
 }
 

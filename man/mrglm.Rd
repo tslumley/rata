@@ -46,6 +46,10 @@ Object of class \code{mrglm} inheriting from \code{glm}
 }
 \references{
 Agresti A and Liu I-M (1999) "Modeling a Categorical Variable Allowing Arbitrarily Many Category Choices" Biometrics 55:936-943
+
+Lumley T, Scott A (2014) "Tests for Regression Models Fitted to Survey Data"  Australian and New Zealand Journal of Statistics 56: 1-14
+
+
 }
 
 

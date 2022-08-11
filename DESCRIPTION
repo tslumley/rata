@@ -5,7 +5,7 @@ Author: Thomas Lumley
 Description: Tools for inference on multiple-response data
 Imports: survey
 Depends: R (>= 3.6.0), rimu
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, ggplot2, ggmosaic
 VignetteBuilder: knitr
 Encoding: UTF-8
 License: GPL-3

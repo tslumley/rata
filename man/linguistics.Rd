@@ -25,7 +25,7 @@ Liu I, Suesse T (2008) "The Analysis of Stratified Multiple Responses" Biometric
 
 \examples{
 data(linguistics)
-lingustics$rate3 <- with(linguistics, ifelse(rating<3, 1, ifelse(rating<7, 2,3)))
+linguistics$rate3 <- with(linguistics, ifelse(rating<3, 1, ifelse(rating<7, 2,3)))
 with(linguistics, mtable(problem, rate3))
 
 \donttest{	  

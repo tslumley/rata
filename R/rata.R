@@ -1,7 +1,6 @@
 ## magic
 present<-function(y) y
 value<-function(x) x
-change<-function(new,old) cbind(new,old)
 
 each<-function(x) x
 
@@ -64,9 +63,13 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     mf <- eval(mf, parent.frame())
     mfterms<-attr(mf,"terms")
 
-    if ((!is.null(attr(tform,"specials")$present)) || (!is.null(attr(tform,"specials")$value))){
+    haspresent<-!is.null(attr(tform,"specials")$present)
+    hasvalue<-!is.null(attr(tform,"specials")$value)
+
+ 
+    
+    if (haspresent || hasvalue ){
         whichlong<-c(attr(tform,"specials")$present,attr(tform,"specials")$value)
-        ##v<-all.vars(attr(tform,"variables")[-1][whichlong])
         v<-unique(unlist(lapply(attr(tform,"variables"), all.vars)[-1][whichlong]))
         if (length(v)>1) stop("Only one variable may have present()/value() terms")
         d<-long_expand(mf[,whichlong[1]], v)
@@ -78,7 +81,7 @@ mrglm<-function (formula, family = gaussian, data, weights, subset,
     } else {
         id1<-NULL
     }
-    
+
     
     if (!is.null(attr(tform,"specials")$each)){
         ## need to expand the data

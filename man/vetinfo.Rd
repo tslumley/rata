@@ -20,18 +20,23 @@ Loughin TM, Scherer PN (1998) "Testing for Association in Contingency Tables wit
 }
 \references{
 Also analysed by
+
 Agresti A and Liu I-M (1999) "Modeling a Categorical Variable Allowing Arbitrarily Many Category Choices" Biometrics 55:936-943
+
 Decady YJ, Thomas DR (2000) "A Simple Test of Association for Contingency Tables with Multiple Column Responses" Biometrics 56: 893-896
 }
 \examples{
 data(vetinfo)
 with(vetinfo, mtable(education, sources))
 
+logistic<-mrglm(present(sources)~value(sources)+education, family=binomial, data=vetinfo)
+summary(logistic)
+anova(logistic)
 
-ll<-long_expand(vetinfo$sources,"sources")
-ll$education<-vetinfo$education[ll$`id(sources)`]
-with(subset(ll, `present(sources)`==1), table(`value(sources)`,education))
- 
-xtabs(`present(sources)`~`value(sources)`+education,data=ll)
+
+loglin<-mrloglin(~sources+education, family=binomial, data=vetinfo)
+summary(loglin)
+anova(loglin, update(loglin, .~.*education))
+
 }
 \keyword{datasets}

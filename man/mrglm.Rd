@@ -9,7 +9,8 @@ Fit marginal generalised linear models to multiple-response data
 This function fits generalised linear models using \code{\link{glm}}, after expanding the data to represent multiple-response categories in either the outcome or predictors. 
 }
 \usage{
-mrglm(formula, family = gaussian, data, weights, subset, na.action, start = NULL, etastart, mustart, offset, control = list(...), model = TRUE, x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...)
+mrglm(formula, family = gaussian, data, weights, subset, na.action, start = NULL, etastart, mustart, offset, control = list(...),
+model = TRUE, x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...)
 \method{anova}{mrglm}(object, object2 = NULL, test = c("F", "Chisq"), method = c("LRT", 
     "Wald"), tolerance = 1e-05, ...) 
 }
@@ -48,8 +49,6 @@ Object of class \code{mrglm} inheriting from \code{glm}
 Agresti A and Liu I-M (1999) "Modeling a Categorical Variable Allowing Arbitrarily Many Category Choices" Biometrics 55:936-943
 
 Lumley T, Scott A (2014) "Tests for Regression Models Fitted to Survey Data"  Australian and New Zealand Journal of Statistics 56: 1-14
-
-
 }
 
 

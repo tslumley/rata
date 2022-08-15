@@ -28,7 +28,7 @@ data(linguistics)
 linguistics$rate3 <- with(linguistics, ifelse(rating<3, 1, ifelse(rating<7, 2,3)))
 with(linguistics, mtable(problem, rate3))
 
-\donttest{	  
+\dontrun{	  
 if (getRversion() >= "4.1.0" && require("ggmosaic")) {
    with(linguistics, mr_stack(problem, rate3)) |>	
      ggplot()+geom_mosaic(aes(x=product(rate3,problem), fill=problem))

@@ -365,3 +365,27 @@ print.seqanova.mrglm<-function (x, ...)
 
 
 SD<-function (x)  if (NCOL(x) > 1) apply(x, 2, sd) else sd(x)
+
+
+
+
+
+
+mrmultinom<-function(formula, data, family=multinomial(),...){
+
+    if (!all(all.vars(formula) %in% names(data)))
+        stop("all variables must be in data= argument")
+
+    mf<-model.frame(formula, data)
+    nms<-sapply(names(mf),as.name)
+    names(nms)<-NULL
+    longmf<-eval(bquote(with(mf, mr_stack(..(nms))),splice=TRUE))
+
+    longdes<-survey::svydesign(id=~id, data=longmf, prob=~1)
+    model<-svyVGAM::svy_vglm(formula, design=longdes,family=family)
+
+    model$call<-sys.call()
+    class(model)<-c("mrmultinom",class(model))
+    model
+}
+

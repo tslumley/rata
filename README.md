@@ -12,3 +12,7 @@ Two main modelling approaches
 The first type are glms with a sandwich variance estimator in expanded data. 
 The second type are loglinear models in expanded data, and the inference procedures 
 are like Rao-Scott-type tests in survey data
+
+```
+remotes::install_github("tslumley/rata")
+```

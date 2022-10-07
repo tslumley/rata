@@ -368,21 +368,58 @@ SD<-function (x)  if (NCOL(x) > 1) apply(x, 2, sd) else sd(x)
 
 
 
+quotify<-function(f) {
+
+    uneach<-function(it) {
+        if (length(it)==1) return(it)
+        if (it[[1]]==as.name("each")){
+            it<-as.symbol(deparse(it))
+        }  else if (length(it)==2){
+            it[[2]]<-uneach(it[[2]])
+        } else if (length(it)==3){
+            it[[2]]<-uneach(it[[2]])
+            it[[3]]<-uneach(it[[3]])
+        }
+        return(it)
+    }
+    uneach(f)
+}
 
 
-
-mrmultinom<-function(formula, data, family=multinomial(),...){
+mrmultinom<-function(formula, data, parallel=TRUE~1,...){
 
     if (!all(all.vars(formula) %in% names(data)))
         stop("all variables must be in data= argument")
 
-    mf<-model.frame(formula, data)
+    mf<-model.frame(formula, data, na.action=na.pass)
     nms<-sapply(names(mf),as.name)
     names(nms)<-NULL
-    longmf<-eval(bquote(with(mf, mr_stack(..(nms))),splice=TRUE))
+    mfterms<-attr(mf,"terms")
 
-    longdes<-survey::svydesign(id=~id, data=longmf, prob=~1)
-    model<-svyVGAM::svy_vglm(formula, design=longdes,family=family)
+    tform<-terms(formula, specials="each")
+    if (!is.null(attr(tform,"specials")$each)){
+        ## need to expand the data
+        whichlong<-attr(tform,"specials")$each
+         nms<-sapply(names(mf)[whichlong],as.name)
+        names(nms)<-NULL
+        longmr<- eval(bquote(with(mf, mr_stack(..(nms))), splice=TRUE))
+        longmf<-mf[longmr$id,,drop=FALSE]
+        longmf[,whichlong]<-longmr[,!(names(longmr) %in% "id"),drop=FALSE]
+        id<-longmr$id
+        longdata<-data[id,]
+        longdata<-cbind(longdata,longmf[,whichlong,drop=FALSE])
+        longdata$.id<-id
+        formula<-quotify(formula)
+    } else {
+        id<-1:NROW(data)
+        longdata<-data
+        longdata$.id<-id
+    }
+
+
+    formula[[2]]<-bquote(wide(.(formula[[2]])))
+    longdes<-survey::svydesign(id=~.id, data=longdata, prob=~1)
+    model<-svyVGAM::svy_vglm(formula, design=longdes,family=multinomial(parallel=parallel),...)
 
     model$call<-sys.call()
     class(model)<-c("mrmultinom",class(model))

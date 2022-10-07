@@ -52,7 +52,7 @@ The underlying code in \code{svyloglin} is a bit fragile. Real examples of it fa
 
 
 \seealso{
-\code{\link{mrglm}} for an alternative modelling approach
+\code{\link{mrglm}} for an alternative modelling approach, \code{\link{mrmultinom}} for multinomial regression models
 
 The vignette "Working models for multiple response data"
 

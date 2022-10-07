@@ -1,0 +1,42 @@
+\name{mrmultinom}
+\alias{mrmultinom}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+Multinomial models for multiple-response data
+}
+\description{
+Models a multiple-response outcome variable as a clustered multinomial variable with each multi-response observation as a cluster.  The \code{\link{wide}} and \code{\link{each}} special terms can be used if there is also a multiple-response predictor. In contrast to \code{\link{mrloglin}} the predictors do not need to be categorical. 
+}
+\usage{
+mrmultinom(formula, data, parallel = FALSE, ...)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{formula}{
+Model formula with a \code{mr} or \code{vmr} object on the left-hand side
+}
+  \item{data}{
+data frame to look up the variables
+}
+\item{parallel}{
+Specifies which formula terms have different coefficients for different responses. See \code{\link[VGAM]{multinomial}} for more details 
+}
+\item{\dots}{
+Passed to \code{\link[VGAM]{multinomial}} in the VGAM package
+}
+}
+
+\value{
+An object of class \code{c("mrmultinom","svy_vglm")}
+}
+
+\note{
+This function requires every observation to have at least one response, because \code{VGAM::multinomial} has that restriction.
+}
+
+\seealso{
+\code{\link{mrloglin}}, \code{\link[VGAM]{multinomial}}
+}
+\examples{
+
+}

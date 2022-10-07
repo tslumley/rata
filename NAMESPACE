@@ -1,7 +1,7 @@
 import(stats)
 export(has, hasonly, hasany, hasall,
        present, value, each, wide,
-       mrglm,  long_expand, mrloglin)
+       mrglm,  long_expand, mrloglin,mrmultinom)
 
 S3method(anova,mrloglin)
 S3method(anova, mrglm)

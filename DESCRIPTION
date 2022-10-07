@@ -1,9 +1,9 @@
 Package: rata
 Title: Responses Analysed Together or Apart
-Version: 0.3
+Version: 0.4
 Author: Thomas Lumley
 Description: Tools for inference on multiple-response data
-Imports: survey
+Imports: survey, svyVGAM
 Depends: R (>= 3.6.0), rimu
 Suggests: knitr, rmarkdown, ggplot2, ggmosaic
 VignetteBuilder: knitr

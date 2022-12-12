@@ -8,7 +8,7 @@ Multinomial models for multiple-response data
 Models a multiple-response outcome variable as a clustered multinomial variable with each multi-response observation as a cluster.  The \code{\link{wide}} and \code{\link{each}} special terms can be used if there is also a multiple-response predictor. In contrast to \code{\link{mrloglin}} the predictors do not need to be categorical. 
 }
 \usage{
-mrmultinom(formula, data, parallel = FALSE, ...)
+mrmultinom(formula, data, parallel = TRUE~1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

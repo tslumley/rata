@@ -71,9 +71,10 @@ The code is similar: there are no backticks in the model formula and the data ex
 rs0 <- mrglm(present(sources)~value(sources)+0, data=vetinfo, family=binomial)
 rs1 <- mrglm(present(sources)~value(sources)+education, data=vetinfo, family=binomial)
 rssat <- mrglm(present(sources)~value(sources)*education, data=vetinfo, family=binomial)
+anova(rs0, rs1)
+anova(rs0, rssat)
 ```
 
-FIXME: anova method?
 
 
 ## Working loglinear models

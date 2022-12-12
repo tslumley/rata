@@ -9,8 +9,8 @@ wide<-function(mr_object) as.matrix(mr_object)
 
 has<-function(mr_object, value) mr_object %has% value
 hasonly<-function(mr_object, value) mr_object %hasonly% value
-hasany<-function(mr_object, value) mr_object %hasany% value
-hasall<-function(mr_object, value) mr_object %hasall% value
+hasany<-function(mr_object, values) mr_object %hasany% values
+hasall<-function(mr_object, values) mr_object %hasall% values
 
 long_expand<-function(mr_object,name){
     y<-as.matrix(as.mr(mr_object))
@@ -378,7 +378,7 @@ quotify<-function(f) {
             it[[2]]<-uneach(it[[2]])
         } else if (length(it)==3){
             it[[2]]<-uneach(it[[2]])
-            it[[3]]<-uneach(it[[3]])
+            it[[3]] <-uneach(it[[3]])
         }
         return(it)
     }

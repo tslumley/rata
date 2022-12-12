@@ -1,8 +1,8 @@
-import(stats)
+import(stats,rimu,svyVGAM)
 export(has, hasonly, hasany, hasall,
        present, value, each, wide,
        mrglm,  long_expand, mrloglin,mrmultinom)
-
+importFrom(VGAM,multinomial)
 S3method(anova,mrloglin)
 S3method(anova, mrglm)
 S3method(print, seqanova.mrglm)

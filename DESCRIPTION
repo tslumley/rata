@@ -3,7 +3,7 @@ Title: Responses Analysed Together or Apart
 Version: 0.4
 Author: Thomas Lumley
 Description: Tools for inference on multiple-response data
-Imports: survey, svyVGAM
+Imports: survey, svyVGAM,VGAM
 Depends: R (>= 3.6.0), rimu
 Suggests: knitr, rmarkdown, ggplot2, ggmosaic
 VignetteBuilder: knitr

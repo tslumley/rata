@@ -26,7 +26,7 @@ A data frame containing all the variables in the formula.
 }
   \item{weights, subset, na.action, start, etastart,mustart,offset, control,model,x,y,singular.ok,contrasts}{
 As in \code{\link{glm}}}
-\item{object1,object2}{Objects of class \code{mrglm} representing nested models to be compared}
+\item{object,object2}{Objects of class \code{mrglm} representing nested models to be compared}
 \item{method,test}{Rao-Scott working likelihood ratio test or Wald test, and F or chi-squared approximation. F is usually preferable}
 \item{tolerance}{Tolerance for checking whether models are actually nested}
 \item{\dots}{not used}

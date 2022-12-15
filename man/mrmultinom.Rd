@@ -5,7 +5,7 @@
 Multinomial models for multiple-response data
 }
 \description{
-Models a multiple-response outcome variable as a clustered multinomial variable with each multi-response observation as a cluster.  The \code{\link{wide}} and \code{\link{each}} special terms can be used if there is also a multiple-response predictor. In contrast to \code{\link{mrloglin}} the predictors do not need to be categorical. 
+Models a multiple-response outcome variable as a clustered multinomial variable with each multi-response observation as a cluster.  The \code{wide} and \code{each} special terms from \code{\link{mrglm}} can be used if there is also a multiple-response predictor. In contrast to \code{\link{mrloglin}} the predictors do not need to be categorical. 
 }
 \usage{
 mrmultinom(formula, data, parallel = TRUE~1, ...)
@@ -38,5 +38,8 @@ This function requires every observation to have at least one response, because 
 \code{\link{mrloglin}}, \code{\link[VGAM]{multinomial}}
 }
 \examples{
+data(vetinfo)
+mrmultinom(sources~as.numeric(education), data=vetinfo)
 
+mrmultinom(sources~education, data=vetinfo)
 }

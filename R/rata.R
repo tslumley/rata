@@ -395,7 +395,10 @@ mrmultinom<-function(formula, data, parallel=TRUE~1,...){
     nms<-sapply(names(mf),as.name)
     names(nms)<-NULL
     mfterms<-attr(mf,"terms")
-
+    zeroes<- mr_count(model.response(mf))==0
+    mf<-mf[!zeroes, ]
+    data<-data[!zeroes,]
+    
     tform<-terms(formula, specials="each")
     if (!is.null(attr(tform,"specials")$each)){
         ## need to expand the data
@@ -415,13 +418,15 @@ mrmultinom<-function(formula, data, parallel=TRUE~1,...){
         longdata<-data
         longdata$.id<-id
     }
-
+    ## remove zero-response ids
+    
 
     formula[[2]]<-bquote(wide(.(formula[[2]])))
     longdes<-survey::svydesign(id=~.id, data=longdata, prob=~1)
     model<-svyVGAM::svy_vglm(formula, design=longdes,family=multinomial(parallel=parallel),...)
 
     model$call<-sys.call()
+    model$zero_omitted<-zeroes
     class(model)<-c("mrmultinom",class(model))
     model
 }

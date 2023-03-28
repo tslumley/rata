@@ -31,7 +31,7 @@ An object of class \code{c("mrmultinom","svy_vglm")}
 }
 
 \note{
-This function requires every observation to have at least one response, because \code{VGAM::multinomial} has that restriction.
+Records with no responses for the outcome variable do not contribute to the multinomial model and will be discarded in fitting. 
 }
 
 \seealso{

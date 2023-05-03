@@ -10,8 +10,8 @@ Two main modelling approaches
 - `mrloglin` and `mrmultinom`: working-multinomial loglinear models (eg Loughin & Scherer)
 
 The first type are glms with a sandwich variance estimator in expanded data. 
-The second type are loglinear or multinomial models in expanded data, and the inference procedures 
-are like Rao-Scott-type tests in survey data
+The second type are loglinear or multinomial models in expanded data, and the 
+inference procedures are like Rao-Scott-type tests in survey data
 
 ```
 remotes::install_github("tslumley/rata")

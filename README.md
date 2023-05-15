@@ -15,4 +15,5 @@ inference procedures are like Rao-Scott-type tests in survey data
 
 ```
 remotes::install_github("tslumley/rata")
+library("raataa")
 ```
